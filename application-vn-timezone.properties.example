@@ -1,0 +1,15 @@
+# Example: Cấu hình timezone Việt Nam (KHÔNG KHUYẾN NGHỊ cho production)
+# Copy nội dung này vào application.properties nếu bạn muốn dùng timezone VN
+
+# Option 1: Dùng offset (KHUYẾN NGHỊ nếu muốn timezone VN)
+spring.datasource.url=jdbc:postgresql://localhost:5432/machineshop
+spring.jpa.properties.hibernate.jdbc.time_zone=+07:00
+
+# Option 2: Dùng tên timezone (có thể gây lỗi tùy PostgreSQL version)
+# spring.datasource.url=jdbc:postgresql://localhost:5432/machineshop
+# spring.jpa.properties.hibernate.jdbc.time_zone=Asia/Ho_Chi_Minh
+
+# Và cập nhật docker-compose.yml:
+# environment:
+#   TZ: Asia/Ho_Chi_Minh
+#   POSTGRES_INITDB_ARGS: "-E UTF8 --locale=en_US.UTF-8"

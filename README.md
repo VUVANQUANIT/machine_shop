@@ -1,0 +1,148 @@
+# Machine Shop - Backend API
+
+Backend service cho ứng dụng Machine Shop được xây dựng với Spring Boot 3.
+
+## 🚀 Công nghệ sử dụng
+
+- **Java 17**
+- **Spring Boot 3.5.10**
+- **PostgreSQL 15**
+- **Spring Security + JWT**
+- **Spring Data JPA**
+- **Lombok**
+- **SpringDoc OpenAPI (Swagger)**
+
+## 📋 Yêu cầu
+
+- Java 17 hoặc cao hơn
+- Maven 3.6+
+- Docker & Docker Compose (cho PostgreSQL)
+- Git
+
+## ⚙️ Cài đặt và Chạy
+
+### 1. Clone repository
+
+```bash
+git clone <your-repo-url>
+cd machinesshop
+```
+
+### 2. Cấu hình môi trường
+
+Copy file `.env.example` thành `.env` và cập nhật các giá trị:
+
+```bash
+cp .env.example .env
+```
+
+Chỉnh sửa `.env` với thông tin của bạn:
+
+```properties
+DATABASE_PASSWORD=your_secure_password
+JWT_SECRET=your_very_long_secure_secret_key_at_least_64_characters
+```
+
+### 3. Khởi động PostgreSQL
+
+```bash
+docker-compose up -d
+```
+
+### 4. Build và chạy ứng dụng
+
+#### Option 1: Sử dụng Maven Wrapper (khuyến nghị)
+
+```bash
+# Windows
+.\mvnw.cmd spring-boot:run
+
+# Linux/Mac
+./mvnw spring-boot:run
+```
+
+#### Option 2: Sử dụng Maven đã cài đặt
+
+```bash
+mvn spring-boot:run
+```
+
+### 5. Truy cập ứng dụng
+
+- API: http://localhost:8080
+- Swagger UI: http://localhost:8080/swagger-ui.html
+- API Docs: http://localhost:8080/v3/api-docs
+
+## 🗃️ Database Schema
+
+### Entities
+
+1. **Product** - Thông tin sản phẩm/máy móc
+2. **Category** - Danh mục sản phẩm
+3. **ProductImage** - Hình ảnh sản phẩm
+4. **ProductSpecification** - Thông số kỹ thuật
+5. **User** - Người dùng (Admin)
+
+## 🔒 Bảo mật
+
+- ⚠️ **QUAN TRỌNG**: Đọc file [SECURITY.md](SECURITY.md) để biết về các vấn đề bảo mật và cách xử lý
+- Sử dụng environment variables cho tất cả thông tin nhạy cảm
+- JWT authentication
+- BCrypt password hashing
+
+## 🧪 Testing
+
+```bash
+# Chạy tất cả tests
+mvn test
+
+# Chạy tests với coverage
+mvn clean test jacoco:report
+```
+
+## 📦 Build Production
+
+```bash
+# Build JAR file
+mvn clean package -DskipTests
+
+# Chạy JAR
+java -jar target/machinesshop-0.0.1-SNAPSHOT.jar
+```
+
+## 🔄 CI/CD
+
+Project sử dụng GitHub Actions cho CI/CD. Workflow tự động chạy khi:
+- Push lên branch `main` hoặc `develop`
+- Tạo Pull Request vào `main` hoặc `develop`
+
+### Cấu hình GitHub Secrets
+
+Thêm các secrets sau vào GitHub repository:
+1. Vào Settings → Secrets and variables → Actions
+2. Thêm secret mới:
+   - `JWT_SECRET`: JWT secret key của bạn (tối thiểu 64 ký tự)
+
+## 📝 API Endpoints (Sẽ được cập nhật)
+
+Xem đầy đủ API documentation tại Swagger UI khi ứng dụng đang chạy:
+http://localhost:8080/swagger-ui.html
+
+## 🛠️ Development
+
+### Code style
+- Sử dụng Lombok để giảm boilerplate code
+- Follow Spring Boot best practices
+- RESTful API design
+
+### Database migrations
+- JPA auto DDL: `spring.jpa.hibernate.ddl-auto=update`
+- Trong production nên sử dụng Flyway hoặc Liquibase
+
+## 📧 Liên hệ
+
+[Thông tin liên hệ của bạn]
+
+## 📄 License
+
+[License của bạn]
