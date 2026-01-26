@@ -61,17 +61,32 @@ docker-compose up -d
 ./mvnw spring-boot:run
 ```
 
-#### Option 2: Sử dụng Maven đã cài đặt
+#### Option 2: Sử dụng script
 
 ```bash
-mvn spring-boot:run
+# Windows
+run.bat
+
+# Linux/Mac
+chmod +x run.sh
+./run.sh
 ```
+
+#### Option 3: Chạy từ IDE ⭐
+
+**⚠️ QUAN TRỌNG**: Đọc file **[IDE_SETUP.md](IDE_SETUP.md)** để cấu hình IDE đúng cách!
+
+- **IntelliJ IDEA**: Run configuration đã được tạo sẵn
+- **VS Code**: Launch configuration đã được tạo sẵn
+
+Nếu không config, bạn sẽ gặp lỗi timezone khi chạy từ IDE!
 
 ### 5. Truy cập ứng dụng
 
 - API: http://localhost:8080
 - Swagger UI: http://localhost:8080/swagger-ui.html
 - API Docs: http://localhost:8080/v3/api-docs
+- Health Check: http://localhost:8080/api/health
 
 ## 🗃️ Database Schema
 
@@ -136,8 +151,28 @@ http://localhost:8080/swagger-ui.html
 - RESTful API design
 
 ### Database migrations
-- JPA auto DDL: `spring.jpa.hibernate.ddl-auto=update`
+- JPA auto DDL: `spring.jpa.hibernate.ddl-auto=update` (dev)
 - Trong production nên sử dụng Flyway hoặc Liquibase
+
+## 📚 Tài liệu
+
+- **[QUICKSTART.md](QUICKSTART.md)** - Hướng dẫn nhanh để bắt đầu
+- **[IDE_SETUP.md](IDE_SETUP.md)** - ⭐ **QUAN TRỌNG**: Cấu hình IDE để chạy không lỗi
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Hướng dẫn deploy production đầy đủ
+- **[SECURITY.md](SECURITY.md)** - Cảnh báo bảo mật và cách xử lý
+
+## ⚠️ Lưu ý quan trọng
+
+### Timezone Configuration
+
+Ứng dụng sử dụng **UTC timezone** (best practice). Nếu bạn chạy từ IDE và gặp lỗi timezone, hãy đọc **[IDE_SETUP.md](IDE_SETUP.md)** để cấu hình đúng.
+
+### Environment Profiles
+
+- **dev**: Development mode (Swagger enabled, debug logging)
+- **prod**: Production mode (Swagger disabled, optimized)
+
+Set profile bằng biến môi trường: `SPRING_PROFILES_ACTIVE=dev`
 
 ## 📧 Liên hệ
 
