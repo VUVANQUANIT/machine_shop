@@ -176,7 +176,7 @@ Set profile bằng biến môi trường: `SPRING_PROFILES_ACTIVE=dev`
 
 ## 📧 Liên hệ
 
-[Thông tin liên hệ của bạn]
+[quancn27@gmail.com]
 
 ## 📄 License
 
