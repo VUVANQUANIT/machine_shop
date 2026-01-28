@@ -3,12 +3,17 @@ package com.example.machinesshop.service;
 import com.example.machinesshop.dto.ProductDTO;
 import com.example.machinesshop.dto.ProductDTORequestCreate;
 import com.example.machinesshop.dto.ProductDTORequestUpdate;
+import com.example.machinesshop.dto.product.PageResponse;
 import com.example.machinesshop.entity.Product;
 import com.example.machinesshop.exception.ResourceNotFoundException;
 import com.example.machinesshop.mappers.ProductMapper;
 import com.example.machinesshop.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,6 +81,23 @@ public class ProductService {
     @Transactional
     public ProductDTO createProduct(ProductDTORequestCreate productDTORequestCreate) {
         return productMapper.toResponseDTO(productRepository.save(productMapper.toEntity(productDTORequestCreate)));
+    }
+    @Transactional(readOnly = true)
+    public PageResponse<ProductDTO> searchByName(String name, int page, int size) {
+        log.info("Find all products by name {}", name);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        Page<Product> productPage;
+        if(name ==  null) {
+            productPage = productRepository.findAll(pageable);
+        }
+        else {
+            productPage = productRepository.findByNameContainingIgnoreCase(name,pageable);
+        }
+        List<ProductDTO> productDTOs = productPage.getContent().stream().map(productMapper::toResponseDTO).toList();
+        return PageResponse.of(productDTOs,productPage);
+
     }
 
 }

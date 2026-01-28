@@ -1,9 +1,8 @@
 package com.example.machinesshop.repository;
 
-import com.example.machinesshop.dto.ProductDTO;
-import com.example.machinesshop.entity.Category;
 import com.example.machinesshop.entity.Product;
-import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,12 +10,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
+        Page<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
         /**
          * Detail query with FETCH JOIN to avoid N+1 on associations.
          */
