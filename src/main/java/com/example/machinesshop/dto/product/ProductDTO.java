@@ -1,7 +1,6 @@
-package com.example.machinesshop.dto;
+package com.example.machinesshop.dto.product;
 
 import com.example.machinesshop.ENUM.ProductStatus;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.math.BigDecimal;

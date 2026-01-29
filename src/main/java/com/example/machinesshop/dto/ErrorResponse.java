@@ -18,6 +18,8 @@ public class ErrorResponse {
     private LocalDateTime timestamp;
     private int status;
     private String error;
+    /** Mã lỗi cho frontend: TOKEN_EXPIRED, REFRESH_TOKEN_EXPIRED, INVALID_TOKEN, INVALID_CREDENTIALS, ... */
+    private String code;
     private String message;
     private String path;
     private List<ValidationError> validationErrors;

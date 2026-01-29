@@ -64,5 +64,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             where p.id = :id
             """)
         int softDeleteById(@Param("id") Long id);
-
+        @Query("""
+            select p 
+            from Product p 
+            left join fetch p.images
+            left join fetch p.category 
+            where p.id = :id 
+            and p.status = com.example.machinesshop.ENUM.ProductStatus.ACTIVE
+            """)
+        Optional<Product> findDetailByIdAndActice(Long id);
 }

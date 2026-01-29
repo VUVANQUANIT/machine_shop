@@ -1,8 +1,8 @@
 package com.example.machinesshop.service;
 
-import com.example.machinesshop.dto.ProductDTO;
-import com.example.machinesshop.dto.ProductDTORequestCreate;
-import com.example.machinesshop.dto.ProductDTORequestUpdate;
+import com.example.machinesshop.dto.product.ProductDTO;
+import com.example.machinesshop.dto.product.ProductDTORequestCreate;
+import com.example.machinesshop.dto.product.ProductDTORequestUpdate;
 import com.example.machinesshop.dto.product.PageResponse;
 import com.example.machinesshop.entity.Product;
 import com.example.machinesshop.exception.ResourceNotFoundException;
@@ -71,7 +71,7 @@ public class ProductService {
         log.info("Deleting product with id {}", id);
 
         // Tìm product với proper error handling
-        Product product = productRepository.findDetailById(id)
+        Product product = productRepository.findDetailByIdAndActice(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format("Không tìm thấy sản phẩm phầm với id = %d", id)));
         int idDelete = productRepository.softDeleteById(id);
