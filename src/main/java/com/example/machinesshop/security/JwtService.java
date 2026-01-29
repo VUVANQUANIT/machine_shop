@@ -26,7 +26,7 @@ public class JwtService {
     }
 
     /**
-     * Tạo JWT access token (ngắn hạn, 15–30 phút).
+     * Tạo JWT access token (ngắn hạn, 15–30 phút).here is the code to generate access token
      */
     public String generateAccessToken(String username, String role) {
         Date now = new Date();
