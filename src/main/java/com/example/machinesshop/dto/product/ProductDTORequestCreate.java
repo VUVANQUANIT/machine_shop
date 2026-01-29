@@ -1,4 +1,4 @@
-package com.example.machinesshop.dto;
+package com.example.machinesshop.dto.product;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;

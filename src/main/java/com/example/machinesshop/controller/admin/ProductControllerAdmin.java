@@ -1,9 +1,8 @@
 package com.example.machinesshop.controller.admin;
 
-import com.example.machinesshop.dto.ProductDTO;
-import com.example.machinesshop.dto.ProductDTORequestCreate;
-import com.example.machinesshop.dto.ProductDTORequestUpdate;
-import com.example.machinesshop.entity.Product;
+import com.example.machinesshop.dto.product.ProductDTO;
+import com.example.machinesshop.dto.product.ProductDTORequestCreate;
+import com.example.machinesshop.dto.product.ProductDTORequestUpdate;
 import com.example.machinesshop.service.ProductService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
