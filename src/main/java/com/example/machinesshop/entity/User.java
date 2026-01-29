@@ -24,6 +24,7 @@ public class User {
     private UserRole role = UserRole.ADMIN;
 
     public enum UserRole {
-        ADMIN
+        ADMIN,
+        USER
     }
 }

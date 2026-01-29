@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +36,7 @@ public class ProductControllerAdmin {
             @ApiResponse(responseCode = "200", description = "Cập nhật sản phẩm thành công"),
             @ApiResponse(responseCode = "404", description = "Không tìm thấy sản phẩm với ID tương ứng")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("{id}")
     public ResponseEntity<ProductDTO> UpdateProduct(
             @Parameter(description = "ID của sản phẩm cần cập nhật")
@@ -53,6 +55,7 @@ public class ProductControllerAdmin {
             @ApiResponse(responseCode = "200", description = "Xóa sản phẩm thành công"),
             @ApiResponse(responseCode = "404", description = "Không tìm thấy sản phẩm với ID tương ứng")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("{id}")
     public ResponseEntity<String> DeleteProduct(
             @Parameter(description = "ID của sản phẩm cần xóa")
@@ -68,6 +71,7 @@ public class ProductControllerAdmin {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Tạo sản phẩm mới thành công")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ProductDTO> CreateProduct(
             @Parameter(description = "Thông tin sản phẩm cần tạo mới")

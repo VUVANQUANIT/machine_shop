@@ -71,7 +71,7 @@ public class ProductService {
         log.info("Deleting product with id {}", id);
 
         // Tìm product với proper error handling
-        Product product = productRepository.findDetailById(id)
+        Product product = productRepository.findDetailByIdAndActice(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format("Không tìm thấy sản phẩm phầm với id = %d", id)));
         int idDelete = productRepository.softDeleteById(id);
