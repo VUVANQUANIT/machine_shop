@@ -2,6 +2,9 @@ package com.example.machinesshop.controller.publicapi;
 
 import com.example.machinesshop.dto.product.ProductDTO;
 import com.example.machinesshop.dto.product.PageResponse;
+import com.example.machinesshop.dto.product.ProductDetailDTO;
+import com.example.machinesshop.dto.product.ProductListDTO;
+import com.example.machinesshop.entity.Product;
 import com.example.machinesshop.service.ProductService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,7 +53,7 @@ public class ProductControllerPublic {
             @ApiResponse(responseCode = "200", description = "Lấy danh sách sản phẩm thành công")
     })
     @GetMapping()
-    public ResponseEntity<List<ProductDTO>> getAllProducts() {
+    public ResponseEntity<List<ProductListDTO>> getAllProducts() {
         return ResponseEntity.ok(productService.getProducts());
     }
 
@@ -72,5 +75,9 @@ public class ProductControllerPublic {
     ) {
         PageResponse<ProductDTO> result = productService.searchByName(name,page,size);
         return ResponseEntity.ok(result);
+    }
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<ProductDetailDTO>  getProductDetailById(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.getProductDetailById(id));
     }
 }

@@ -4,7 +4,9 @@ import com.example.machinesshop.ENUM.ProductStatus;
 import com.example.machinesshop.dto.product.ProductDTO;
 import com.example.machinesshop.dto.product.ProductDTORequestCreate;
 import com.example.machinesshop.dto.product.ProductDTORequestUpdate;
+import com.example.machinesshop.dto.product.ProductDetailDTO;
 import com.example.machinesshop.entity.Product;
+import com.example.machinesshop.entity.ProductImage;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -46,5 +48,16 @@ public interface ProductMapper{
         if (dto.getStatus() != null) product.setStatus(toProductStatus(dto.getStatus()));
         if (dto.getCategoryId() != null) product.setCategoryId(dto.getCategoryId());
         if (dto.getIsActive() != null) product.setIsActive(dto.getIsActive());
+    }
+    @Mapping(target = "categoryName",source = "category.name")
+    @Mapping(target = "images",expression = "java(mapImages(product))")
+    ProductDetailDTO toDetailDTO(Product product);
+    default List<String> mapImages(Product product) {
+        if (product.getImages() == null) return List.of();
+
+        return product.getImages()
+                .stream()
+                .map(ProductImage::getImageUrl)
+                .toList();
     }
 }

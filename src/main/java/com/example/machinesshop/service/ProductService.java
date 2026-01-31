@@ -1,9 +1,6 @@
 package com.example.machinesshop.service;
 
-import com.example.machinesshop.dto.product.ProductDTO;
-import com.example.machinesshop.dto.product.ProductDTORequestCreate;
-import com.example.machinesshop.dto.product.ProductDTORequestUpdate;
-import com.example.machinesshop.dto.product.PageResponse;
+import com.example.machinesshop.dto.product.*;
 import com.example.machinesshop.entity.Product;
 import com.example.machinesshop.exception.ResourceNotFoundException;
 import com.example.machinesshop.mappers.ProductMapper;
@@ -38,15 +35,23 @@ public class ProductService {
         ProductDTO productDTO = productMapper.toResponseDTO(product.get());
         return productDTO;
     }
+    @Transactional
+    public ProductDetailDTO getProductDetailById(Long id) {
+        log.info("Find product by id {}", id);
+        Product product = productRepository.findDetailById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy"));
+
+        return productMapper.toDetailDTO(product);
+    }
     @Transactional(readOnly = true)
-    public List<ProductDTO> getProducts() {
+    public List<ProductListDTO> getProducts() {
         log.info("Find all products");
-        List<Product> products = productRepository.findAllActive();
+        List<ProductListDTO> products = productRepository.findAllActive();
         if (products.isEmpty()) {
             log.error("No products found");
             throw new ResourceNotFoundException(String.format("Không có sản phẩm nào được tìm thấy"));
         }
-        return products.stream().map(productMapper::toResponseDTO).toList();
+        return products;
     }
     @Transactional
     public ProductDTO updateProducts(ProductDTORequestUpdate  productDTORequestUpdate,Long id) {
