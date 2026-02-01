@@ -1,8 +1,10 @@
 package com.example.machinesshop.controller.publicapi;
 
-import com.example.machinesshop.dto.ProductDTO;
+import com.example.machinesshop.dto.product.ProductDTO;
 import com.example.machinesshop.dto.product.PageResponse;
-import com.example.machinesshop.repository.ProductRepository;
+import com.example.machinesshop.dto.product.ProductDetailDTO;
+import com.example.machinesshop.dto.product.ProductListDTO;
+import com.example.machinesshop.entity.Product;
 import com.example.machinesshop.service.ProductService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,9 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,7 +53,7 @@ public class ProductControllerPublic {
             @ApiResponse(responseCode = "200", description = "Lấy danh sách sản phẩm thành công")
     })
     @GetMapping()
-    public ResponseEntity<List<ProductDTO>> getAllProducts() {
+    public ResponseEntity<List<ProductListDTO>> getAllProducts() {
         return ResponseEntity.ok(productService.getProducts());
     }
 
@@ -75,5 +75,9 @@ public class ProductControllerPublic {
     ) {
         PageResponse<ProductDTO> result = productService.searchByName(name,page,size);
         return ResponseEntity.ok(result);
+    }
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<ProductDetailDTO>  getProductDetailById(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.getProductDetailById(id));
     }
 }

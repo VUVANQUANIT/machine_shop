@@ -1,9 +1,10 @@
 package com.example.machinesshop.controller.admin;
 
-import com.example.machinesshop.dto.ProductDTO;
-import com.example.machinesshop.dto.ProductDTORequestCreate;
-import com.example.machinesshop.dto.ProductDTORequestUpdate;
-import com.example.machinesshop.entity.Product;
+import com.example.machinesshop.dto.product.ProductDTO;
+import com.example.machinesshop.dto.product.ProductDTORequestCreate;
+import com.example.machinesshop.dto.product.ProductDTORequestUpdate;
+import com.example.machinesshop.repository.ProductRepository;
+import com.example.machinesshop.service.ProductImageServiceImpl;
 import com.example.machinesshop.service.ProductService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,13 +14,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/products")
@@ -28,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class ProductControllerAdmin {
     private final ProductService productService;
+    private final ProductImageServiceImpl productImageService;
     @Operation(
             summary = "Cập nhật thông tin sản phẩm",
             description = "Cập nhật thông tin chi tiết của một sản phẩm dựa trên ID và dữ liệu truyền vào."
@@ -36,6 +36,7 @@ public class ProductControllerAdmin {
             @ApiResponse(responseCode = "200", description = "Cập nhật sản phẩm thành công"),
             @ApiResponse(responseCode = "404", description = "Không tìm thấy sản phẩm với ID tương ứng")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("{id}")
     public ResponseEntity<ProductDTO> UpdateProduct(
             @Parameter(description = "ID của sản phẩm cần cập nhật")
@@ -54,6 +55,7 @@ public class ProductControllerAdmin {
             @ApiResponse(responseCode = "200", description = "Xóa sản phẩm thành công"),
             @ApiResponse(responseCode = "404", description = "Không tìm thấy sản phẩm với ID tương ứng")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("{id}")
     public ResponseEntity<String> DeleteProduct(
             @Parameter(description = "ID của sản phẩm cần xóa")
@@ -69,6 +71,7 @@ public class ProductControllerAdmin {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Tạo sản phẩm mới thành công")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ProductDTO> CreateProduct(
             @Parameter(description = "Thông tin sản phẩm cần tạo mới")
@@ -76,5 +79,13 @@ public class ProductControllerAdmin {
     ) {
         return ResponseEntity.ok(productService.createProduct(productDTORequestCreate));
     }
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/images")
+    public ResponseEntity<?> upload(
+            @PathVariable Long id,
+            @RequestParam("files") List<MultipartFile> files) {
 
+        productImageService.uploadImages(id, files);
+        return ResponseEntity.ok().build();
+    }
 }

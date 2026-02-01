@@ -1,5 +1,6 @@
 package com.example.machinesshop.repository;
 
+import com.example.machinesshop.dto.product.ProductListDTO;
 import com.example.machinesshop.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,13 +46,18 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         List<Product> findByCategoryActive(@Param("categoryId") Long categoryId);
 
         @Query("""
-            select distinct p
+            select new com.example.machinesshop.dto.product.ProductListDTO(
+                        p.id,
+                        p.name,
+                        p.price,
+                        min(i.imageUrl)
+            )
             from Product p
-            left join fetch p.images
-            left join fetch p.category
+            left join ProductImage i on p.id = i.productId
             where p.status = com.example.machinesshop.ENUM.ProductStatus.ACTIVE
+            group by p.id,p.name,p.description
             """)
-        List<Product> findAllActive();
+        List<ProductListDTO> findAllActive();
 
         /**
          * Soft delete: set status = INACTIVE.
@@ -64,5 +70,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             where p.id = :id
             """)
         int softDeleteById(@Param("id") Long id);
-
+        @Query("""
+            select p 
+            from Product p 
+            left join fetch p.images
+            left join fetch p.category 
+            where p.id = :id 
+            and p.status = com.example.machinesshop.ENUM.ProductStatus.ACTIVE
+            """)
+        Optional<Product> findDetailByIdAndActice(Long id);
 }
