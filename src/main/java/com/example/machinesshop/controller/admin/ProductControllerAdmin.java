@@ -84,6 +84,11 @@ public class ProductControllerAdmin {
     public ResponseEntity<?> upload(
             @PathVariable Long id,
             @RequestParam("files") List<MultipartFile> files) {
+        for (MultipartFile file : files) {
+            if (file.getSize() > 10 * 1024 * 1024) { // 10MB
+                return ResponseEntity.badRequest().body("File vượt quá 10MB");
+            }
+        }
 
         productImageService.uploadImages(id, files);
         return ResponseEntity.ok().build();
