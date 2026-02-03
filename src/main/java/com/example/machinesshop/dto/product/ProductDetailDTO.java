@@ -7,9 +7,11 @@ import java.util.List;
 
 @Data
 public class ProductDetailDTO {
-    Long id;
-    String name;
-    BigDecimal price;
-    List<String> images;
-    String categoryName;
+    private Long id;
+    private String name;
+    private BigDecimal price;
+    private List<String> images;
+    private String categoryName;
+    /** Thông số kỹ thuật – hiển thị dạng list (mỗi phần tử: specKey + specValue). */
+    private List<SpecEntryDTO> specifications;
 }
