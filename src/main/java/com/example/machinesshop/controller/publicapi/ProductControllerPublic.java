@@ -4,7 +4,6 @@ import com.example.machinesshop.dto.product.ProductDTO;
 import com.example.machinesshop.dto.product.PageResponse;
 import com.example.machinesshop.dto.product.ProductDetailDTO;
 import com.example.machinesshop.dto.product.ProductListDTO;
-import com.example.machinesshop.entity.Product;
 import com.example.machinesshop.service.ProductService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,23 +57,23 @@ public class ProductControllerPublic {
     }
 
     @Operation(
-            summary = "Tìm kiếm sản phẩm theo tên",
-            description = "Tìm kiếm sản phẩm theo tên (không bắt buộc), có phân trang theo `page` và `size`."
+            summary = "Tìm kiếm & lọc sản phẩm (production)",
+            description = "Tìm theo từ khóa, lọc theo loại sản phẩm và khoảng giá, phân trang, sắp xếp. Chỉ trả về sản phẩm ACTIVE."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Tìm kiếm sản phẩm thành công")
+            @ApiResponse(responseCode = "200", description = "Thành công")
     })
     @GetMapping("/search")
-    public ResponseEntity<PageResponse<ProductDTO>>  searchProducts(
-            @Parameter(description = "Tên sản phẩm cần tìm kiếm (có thể bỏ trống để lấy tất cả)")
-            @RequestParam(required = false) String name,
-            @Parameter(description = "Trang hiện tại, bắt đầu từ 0")
-            @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "Số lượng phần tử mỗi trang")
-            @RequestParam(defaultValue = "10") int size
+    public ResponseEntity<PageResponse<ProductListDTO>> search(
+            @Parameter(description = "Từ khóa tìm trong tên sản phẩm") @RequestParam(required = false) String keyword,
+            @Parameter(description = "Lọc theo ID loại sản phẩm (category)") @RequestParam(required = false) Long categoryId,
+            @Parameter(description = "Giá tối thiểu (VNĐ)") @RequestParam(required = false) java.math.BigDecimal minPrice,
+            @Parameter(description = "Giá tối đa (VNĐ)") @RequestParam(required = false) java.math.BigDecimal maxPrice,
+            @Parameter(description = "Trang (0-based)") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Số phần tử mỗi trang") @RequestParam(defaultValue = "12") int size,
+            @Parameter(description = "Sắp xếp: field,direction. Ví dụ price,asc hoặc createdAt,desc. Field cho phép: price, createdAt, name") @RequestParam(required = false) String sort
     ) {
-        PageResponse<ProductDTO> result = productService.searchByName(name,page,size);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(productService.search(keyword, categoryId, minPrice, maxPrice, page, size, sort));
     }
     @GetMapping("/detail/{id}")
     public ResponseEntity<ProductDetailDTO>  getProductDetailById(@PathVariable Long id) {
