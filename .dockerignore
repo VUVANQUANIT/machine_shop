@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+
+# Build output (build lại trong Docker)
+target/
+
+# Environment & secrets (cấu hình trên Railway, không đưa vào image)
+.env
+.env.*
+!.env.example
+
+# IDE & OS
+.idea
+.vscode
+*.iml
+*.ipr
+*.iws
+.DS_Store
+Thumbs.db
+
+# Docs & scripts (không cần trong container)
+*.md
+!README.md
+run.bat
+run.sh
+test-api.bat
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Test
+src/test/
+
+# Maven wrapper jar (sẽ dùng từ COPY, không cần cache local)
+.mvn/wrapper/maven-wrapper.jar
