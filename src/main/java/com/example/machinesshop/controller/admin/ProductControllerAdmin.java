@@ -5,7 +5,7 @@ import com.example.machinesshop.dto.product.ProductDTO;
 import com.example.machinesshop.dto.product.ProductDTORequestCreate;
 import com.example.machinesshop.dto.product.ProductDTORequestUpdate;
 import com.example.machinesshop.dto.product.SpecEntryDTO;
-import com.example.machinesshop.service.ProductImageServiceImpl;
+import com.example.machinesshop.uploads.ProductImageService;
 import com.example.machinesshop.service.ProductSpecificationService;
 import com.example.machinesshop.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +30,7 @@ import java.util.Map;
 @Slf4j
 public class ProductControllerAdmin {
     private final ProductService productService;
-    private final ProductImageServiceImpl productImageService;
+    private final ProductImageService productImageService; // Dependency Inversion: inject interface
     private final ProductSpecificationService productSpecificationService;
     @Operation(
             summary = "Cập nhật thông tin sản phẩm",
