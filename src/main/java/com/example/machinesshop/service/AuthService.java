@@ -30,6 +30,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final JwtConfig jwtConfig;
+    private final EmailQueueService emailQueueService;
 
     @Transactional
     public LoginResponseDTO login(LoginRequestDTO request) {
@@ -49,12 +50,18 @@ public class AuthService {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new IllegalArgumentException("Tên đăng nhập đã tồn tại.");
         }
+        if(userRepository.existsByEmail(request.getEmail())){
+            throw new IllegalArgumentException("Email đã tồn tại.");
+        }
+
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setRole(User.UserRole.USER);
+        user.setEmail(request.getEmail());
         user = userRepository.save(user);
         log.info("User registered: {}", user.getUsername());
+        emailQueueService.senWelcomeEmail(user);
         return issueTokens(user);
     }
 

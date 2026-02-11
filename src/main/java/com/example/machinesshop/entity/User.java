@@ -1,6 +1,7 @@
 package com.example.machinesshop.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,6 +23,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private UserRole role = UserRole.ADMIN;
+
+    @Email
+    @Column(name = "email", nullable = false, length = 256)
+    private String email;
 
     public enum UserRole {
         ADMIN,
