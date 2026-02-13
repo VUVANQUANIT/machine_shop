@@ -31,10 +31,29 @@ public class EmailQueueService {
         );
 
         emailMessage.setBody(body);
-        emailMessage.setType(TYPE_EMAIL.WELCOME); // Convert Enum sang String để .NET dễ đọc
+        emailMessage.setType(TYPE_EMAIL.WELCOME);
 
-        // QUAN TRỌNG: Tên queue phải khớp với bên .NET (email_queue)
+
         rabbitTemplate.convertAndSend("email_queue", emailMessage);
 
+    }
+    public void SendEmailResetPassword(String email,String token) {
+        EmailMessage emailMessage = new EmailMessage();
+        emailMessage.setTo(email);
+        emailMessage.setSubject("Đây là email khôi phục mật khẩu");
+
+        String body = String.format(
+                "Đây là mail khôi phục mật khẩu cho tài khoản %s,\n\n" +
+                        "Vui lòng không chia sẻ OTP cho bất kì ai \n\n" +
+                        "Mã khôi phục: "+ token
+
+                ,
+                email
+        );
+
+        emailMessage.setBody(body);
+        emailMessage.setType(TYPE_EMAIL.OTP);
+
+        rabbitTemplate.convertAndSend("email_queue", emailMessage);
     }
 }

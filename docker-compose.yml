@@ -20,5 +20,14 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
+  redis:
+    image: redis:7
+    container_name: redis_java_spring
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    command: ["redis-server","--appendonly","yes"]
 volumes:
   pgdata:
+  redisdata:
