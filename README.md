@@ -88,6 +88,14 @@ Nếu không config, bạn sẽ gặp lỗi timezone khi chạy từ IDE!
 - API Docs: http://localhost:8080/v3/api-docs
 - Health Check: http://localhost:8080/api/health
 
+## ✨ Tính năng chính
+
+- **Xác thực JWT**: Đăng nhập, đăng ký, refresh token
+- **Email chào mừng**: Sau khi đăng ký thành công, hệ thống gửi email chào mừng tới người dùng (tiêu đề: "Chào mừng đến với cửa hàng Hằng Hải"). Email được xử lý qua hàng đợi (RabbitMQ) để không chặn response.
+- **Quên mật khẩu**: Luồng OTP qua email — người dùng nhập email → nhận OTP 6 số (hiệu lực 5 phút) → xác thực OTP để lấy reset token (hiệu lực 10 phút) → đặt lại mật khẩu. OTP và reset token lưu trên Redis; sau 5 lần nhập sai OTP phải yêu cầu mã mới.
+- **API công khai**: Danh sách & chi tiết sản phẩm, tìm kiếm/lọc theo keyword, category, giá, phân trang
+- **API Admin (JWT)**: CRUD sản phẩm, category, upload ảnh, thêm thông số kỹ thuật
+
 ## 🗃️ Database Schema
 
 ### Entities
@@ -138,9 +146,13 @@ Thêm các secrets sau vào GitHub repository:
 2. Thêm secret mới:
    - `JWT_SECRET`: JWT secret key của bạn (tối thiểu 64 ký tự)
 
-## 📝 API Endpoints (Sẽ được cập nhật)
+## 📝 API Endpoints
 
-Xem đầy đủ API documentation tại Swagger UI khi ứng dụng đang chạy:
+- **Auth**: Đăng nhập, đăng ký, refresh token, **quên mật khẩu** (request OTP → verify OTP → reset password)
+- **Công khai**: Health, danh sách/chi tiết sản phẩm, tìm kiếm & lọc, danh sách category
+- **Admin (JWT)**: CRUD sản phẩm & category, upload ảnh, thêm thông số kỹ thuật
+
+Chi tiết request/response xem **[API.md](API.md)**. Khi ứng dụng chạy, có thể xem thêm tại Swagger UI:
 http://localhost:8080/swagger-ui.html
 
 ## 🛠️ Development
