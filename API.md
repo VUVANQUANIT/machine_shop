@@ -94,6 +94,7 @@ Frontend nên: kiểm tra `response.success`, hiển thị `response.message`, d
 ```json
 {
   "username": "string",
+  "email": "string",
   "password": "string",
   "passwordConfirm": "string"
 }
@@ -102,13 +103,17 @@ Frontend nên: kiểm tra `response.success`, hiển thị `response.message`, d
 | Field | Type | Bắt buộc | Ràng buộc |
 |-------|------|----------|-----------|
 | username | string | Có | Chỉ `a-zA-Z0-9._-`, max 50 |
+| email | string | Có | Định dạng email, max 50 ký tự |
 | password | string | Có | Min 8 ký tự, ít nhất 1 chữ thường, 1 hoa, 1 số, 1 ký tự đặc biệt `@$!%*?&` |
 | passwordConfirm | string | Có | Phải trùng `password` |
 
 **Response 200:** Cùng format như đăng nhập (accessToken, refreshToken, tokenType, expiresIn).
 
+**Hành vi bổ sung:** Sau khi đăng ký thành công, hệ thống **gửi email chào mừng** tới địa chỉ email đã đăng ký (tiêu đề: "Chào mừng đến với cửa hàng Hằng Hải"). Email được đưa vào hàng đợi (queue), không ảnh hưởng thời gian phản hồi API.
+
 **Lỗi 400:** Validation (ví dụ mật khẩu không đủ mạnh, passwordConfirm không khớp).  
-**Lỗi 400:** `"Tên đăng nhập đã tồn tại"` nếu username trùng.
+**Lỗi 400:** `"Tên đăng nhập đã tồn tại"` nếu username trùng.  
+**Lỗi 400:** `"Email đã tồn tại"` nếu email đã được sử dụng.
 
 ---
 
@@ -129,6 +134,131 @@ Gọi khi API trả **401** với `code: "TOKEN_EXPIRED"`. Dùng `refreshToken` 
 **Response 200:** Cùng format như login (accessToken, refreshToken mới, tokenType, expiresIn). Lưu lại token mới và dùng cho request tiếp theo.
 
 **Lỗi 401:** `code: "INVALID_TOKEN"` – refresh token không hợp lệ hoặc đã hết hạn → chuyển user về màn hình đăng nhập.
+
+---
+
+### 2.4 Quên mật khẩu (Forgot Password)
+
+Luồng gồm 3 bước: **yêu cầu OTP** → **xác thực OTP** (nhận reset token) → **đặt lại mật khẩu**.
+
+#### 2.4.1 Yêu cầu gửi OTP
+
+**POST** `/api/auth/forgot-password/request`
+
+Gửi email; nếu tài khoản tồn tại, hệ thống gửi OTP 6 chữ số qua email. API **luôn trả 200** với thông điệp chung (không tiết lộ email có tồn tại hay không).
+
+**Request body (JSON):**
+
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+| Field | Type | Bắt buộc | Ràng buộc |
+|-------|------|----------|-----------|
+| email | string | Có | Định dạng email, 6–50 ký tự |
+
+**Response 200:**
+
+```json
+{
+  "success": true,
+  "message": "Neu email ton tai, OTP da duoc gui.",
+  "data": null,
+  "timestamp": "2025-01-28T10:00:00.123Z"
+}
+```
+
+OTP có hiệu lực **5 phút**. Sau khi nhận OTP, người dùng nhập vào bước xác thực.
+
+---
+
+#### 2.4.2 Xác thực OTP và lấy reset token
+
+**POST** `/api/auth/forgot-password/verify-otp`
+
+Gửi email + OTP 6 chữ số; nếu đúng, trả về **reset token** dùng cho bước đặt lại mật khẩu. Reset token có hiệu lực **10 phút**.
+
+**Request body (JSON):**
+
+```json
+{
+  "email": "user@example.com",
+  "otp": "123456"
+}
+```
+
+| Field | Type | Bắt buộc | Ràng buộc |
+|-------|------|----------|-----------|
+| email | string | Có | Định dạng email, 6–50 ký tự |
+| otp | string | Có | Đúng 6 chữ số |
+
+**Response 200:**
+
+```json
+{
+  "success": true,
+  "message": "Xac thuc OTP thanh cong.",
+  "data": {
+    "resetToken": "uuid-string-without-dashes",
+    "expiresInSeconds": 600
+  },
+  "timestamp": "2025-01-28T10:00:00.123Z"
+}
+```
+
+| Field | Type | Mô tả |
+|-------|------|--------|
+| resetToken | string | Token dùng cho POST `/api/auth/forgot-password/reset` |
+| expiresInSeconds | number | Thời gian hiệu lực còn lại (giây) |
+
+**Lỗi 401 / 400:**  
+- `"OTP đã hết hạn hoặc không tồn tại."` – OTP quá 5 phút hoặc chưa gửi.  
+- `"OTP không hợp lệ."` – Sai OTP; sau **5 lần sai** liên tiếp: `"OTP không hợp lệ. Vui lòng yêu cầu mã mới."` (cần gọi lại `/forgot-password/request`).
+
+---
+
+#### 2.4.3 Đặt lại mật khẩu
+
+**POST** `/api/auth/forgot-password/reset`
+
+Dùng **reset token** (nhận từ bước verify OTP) để đặt mật khẩu mới.
+
+**Request body (JSON):**
+
+```json
+{
+  "resetToken": "uuid-from-verify-otp",
+  "newPassword": "NewPass@1",
+  "confirmPassword": "NewPass@1"
+}
+```
+
+| Field | Type | Bắt buộc | Ràng buộc |
+|-------|------|----------|-----------|
+| resetToken | string | Có | Token từ response verify-otp |
+| newPassword | string | Có | 8–100 ký tự, ít nhất 1 chữ thường, 1 hoa, 1 số, 1 ký tự đặc biệt `@$!%*?&` |
+| confirmPassword | string | Có | Phải trùng `newPassword` |
+
+**Response 200:**
+
+```json
+{
+  "success": true,
+  "message": "Dat lai mat khau thanh cong.",
+  "data": null,
+  "timestamp": "2025-01-28T10:00:00.123Z"
+}
+```
+
+Sau khi đặt mật khẩu thành công, mọi **refresh token** của user đó bị thu hồi; user cần đăng nhập lại bằng mật khẩu mới.
+
+**Lỗi 400:**  
+- `"Mat khau va xac nhan mat khau khong khop."` – newPassword ≠ confirmPassword.  
+- Validation (mật khẩu không đủ mạnh).  
+
+**Lỗi 401 / 400:** `"Reset token đã hết hạn hoặc không hợp lệ."` – token quá 10 phút hoặc đã dùng.
 
 ---
 
@@ -545,8 +675,30 @@ export interface LoginResponse {
 
 export interface RegisterRequest {
   username: string;
+  email: string;
   password: string;
   passwordConfirm: string;
+}
+
+// Forgot password
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ForgotPasswordVerifyRequest {
+  email: string;
+  otp: string;
+}
+
+export interface ForgotPasswordResponse {
+  resetToken: string;
+  expiresInSeconds: number;
+}
+
+export interface ResetPasswordRequest {
+  resetToken: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
 export interface RefreshRequest {
@@ -691,8 +843,11 @@ imageUrl = `${environment.apiUrl}${product.thumbnail}`;
 | GET | /api/health | Không | Health check |
 | GET | /api/ | Không | Welcome |
 | POST | /api/auth/login | Không | Đăng nhập |
-| POST | /api/auth/register | Không | Đăng ký |
+| POST | /api/auth/register | Không | Đăng ký (gửi email chào mừng sau khi thành công) |
 | POST | /api/auth/refresh | Không | Refresh token |
+| POST | /api/auth/forgot-password/request | Không | Yêu cầu OTP quên mật khẩu |
+| POST | /api/auth/forgot-password/verify-otp | Không | Xác thực OTP, lấy reset token |
+| POST | /api/auth/forgot-password/reset | Không | Đặt lại mật khẩu bằng reset token |
 | GET | /api/public/products | Không | Danh sách sản phẩm |
 | GET | /api/public/products/{id} | Không | Chi tiết (ProductDTO) |
 | GET | /api/public/products/detail/{id} | Không | Chi tiết (ảnh, category) |

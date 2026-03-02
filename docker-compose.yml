@@ -11,6 +11,23 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq_java_spring
+    ports:
+      - "5672:5672"   # Cổng để ứng dụng kết nối gửi/nhận tin nhắn
+      - "15672:15672" # Cổng để bạn vào giao diện Web quản lý (Username/Pass mặc định: guest/guest)
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+  redis:
+    image: redis:7
+    container_name: redis_java_spring
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    command: ["redis-server","--appendonly","yes"]
 volumes:
   pgdata:
+  redisdata:
