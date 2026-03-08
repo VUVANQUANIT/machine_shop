@@ -19,7 +19,7 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
 
-        Page<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
+        Page<Product> findByNameContainingIgnoreCaseAndIsActiveTrue(String name, Pageable pageable);
         /**
          * Detail query with FETCH JOIN to avoid N+1 on associations.
          */
@@ -29,6 +29,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             left join fetch p.images
             left join fetch p.category
             where p.id = :id
+                        and p.isActive = true
             """)
         Optional<Product> findDetailById(@Param("id") Long id);
 
@@ -41,8 +42,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             from Product p
             left join fetch p.images
             left join fetch p.category
-            where p.status = com.example.machinesshop.ENUM.ProductStatus.ACTIVE
-              and (:categoryId is null or p.categoryId = :categoryId)
+            where  (:categoryId is null or p.categoryId = :categoryId)
+                           and p.isActive = true
             """)
         List<Product> findByCategoryActive(@Param("categoryId") Long categoryId);
 
@@ -55,7 +56,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             )
             from Product p
             left join ProductImage i on p.id = i.productId
-            where p.status = com.example.machinesshop.ENUM.ProductStatus.ACTIVE
+            where  p.isActive = true
             group by p.id,p.name,p.description
             """)
         List<ProductListDTO> findAllActive();
@@ -67,8 +68,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
         @Modifying
         @Query("""
             update Product p
-            set p.status = com.example.machinesshop.ENUM.ProductStatus.INACTIVE
-            where p.id = :id
+            set p.isActive = false 
+            where p.id = :id and p.isActive = true
             """)
         int softDeleteById(@Param("id") Long id);
         @Query("""
@@ -77,7 +78,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             left join fetch p.images
             left join fetch p.category 
             where p.id = :id 
-            and p.status = com.example.machinesshop.ENUM.ProductStatus.ACTIVE
+            and  p.isActive = true 
             """)
-        Optional<Product> findDetailByIdAndActice(Long id);
+        Optional<Product> findDetailByIdActive(Long id);
 }

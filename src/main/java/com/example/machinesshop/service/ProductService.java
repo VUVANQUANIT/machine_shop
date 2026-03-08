@@ -90,13 +90,14 @@ public class ProductService {
     public String deleteProductById(Long id) {
         log.info("Deleting product with id {}", id);
 
-        // Tìm product với proper error handling
-        Product product = productRepository.findDetailByIdAndActice(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("Không tìm thấy sản phẩm phầm với id = %d", id)));
-        int idDelete = productRepository.softDeleteById(id);
-        log.info("Product deleted successfully");
-       return "Xoá thành công sản phẩm";
+        int rows = productRepository.softDeleteById(id); // query nên có điều kiện isActive = true
+
+        if (rows == 0) {
+            throw new ResourceNotFoundException(String.format("Không tìm thấy sản phẩm với id = %d", id));
+        }
+
+        log.info("Deleted product successfully with id {}", id);
+        return "Xóa thành công sản phẩm";
     }
     @Transactional
     public ProductDTO createProduct(ProductDTORequestCreate productDTORequestCreate) {
@@ -108,7 +109,7 @@ public class ProductService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<Product> productPage = name == null || !StringUtils.hasText(name)
                 ? productRepository.findAll(pageable)
-                : productRepository.findByNameContainingIgnoreCase(name.trim(), pageable);
+                : productRepository.findByNameContainingIgnoreCaseAndIsActiveTrue(name.trim(), pageable);
         List<ProductDTO> productDTOs = productPage.getContent().stream().map(productMapper::toResponseDTO).toList();
         return PageResponse.of(productDTOs, productPage);
     }
